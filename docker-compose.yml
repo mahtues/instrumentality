@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+    redis:
+        image: redis:latest
+
+    mongodb:
+        image: mongo:latest
+
+    mariadb:
+        image: mariadb:latest
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+
+    adminer:
+        image: adminer:latest
+        ports:
+            - 8080:8080
+        environment:
+            ADMINER_DESIGN: pepa-linha
