@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"go.elastic.co/apm/module/apmhttp"
 	"net/http"
 )
 
@@ -21,7 +22,7 @@ func main() {
 	mux.Handle("/private", AuthorizationMiddleware(EchoHandler()))
 	mux.Handle("/public/", http.StripPrefix("/public", mux2))
 
-	err := http.ListenAndServe(":80", mux)
+	err := http.ListenAndServe(":80", apmhttp.Wrap(mux))
 
 	if err != nil {
 		log.Fatal(err)
