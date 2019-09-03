@@ -17,6 +17,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", middleware.Duration(handler.Echo()))
+	mux.Handle("/mongodb", handler.MongoDb())
 	mux.Handle("/private", middleware.Authorization(handler.Echo()))
 	mux.Handle("/public/", http.StripPrefix("/public", mux2))
 
