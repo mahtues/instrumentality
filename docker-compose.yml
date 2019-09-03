@@ -37,5 +37,6 @@ services:
         ports:
             - 80:80
         environment:
-            - ELASTIC_APM_SERVICE_NAME=app
             - ELASTIC_APM_SERVER_URL=http://apmserver:8200
+            - ELASTIC_APM_SERVICE_NAME=app
+            - ELASTIC_APM_ENVIRONMENT=docker
