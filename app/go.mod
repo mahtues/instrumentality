@@ -10,6 +10,7 @@ require (
 	github.com/fatih/gomodifytags v1.0.1 // indirect
 	github.com/fatih/motion v1.0.0 // indirect
 	github.com/google/shlex v0.0.0-20181106134648-c34317bd91bf // indirect
+	github.com/google/uuid v1.1.1
 	github.com/josharian/impl v0.0.0-20190715203526-f0d59e96e372 // indirect
 	github.com/jstemmer/gotags v1.4.1 // indirect
 	github.com/kisielk/errcheck v1.2.0 // indirect

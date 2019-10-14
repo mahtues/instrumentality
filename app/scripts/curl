@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+COOKIE_FILE=/tmp/cookies
+
+# create account
+curl -i -X POST -d 'username=matheus&password=root' http://localhost/signup
+echo ---
+
+# sign in
+curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=root' http://localhost/signin
+echo ---
+
+# home
+curl -i -b ${COOKIE_FILE} -X GET http://localhost/home
+echo ---
+
+# sign out
+curl -i -b ${COOKIE_FILE} -X GET http://localhost/signout
+echo ---
+
+# home
+curl -i -b ${COOKIE_FILE} -X GET http://localhost/home
