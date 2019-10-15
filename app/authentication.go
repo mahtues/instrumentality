@@ -4,16 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-
-	"github.com/google/uuid"
 )
 
 type contextKey int
 
 const nameKey = contextKey(0)
-
-var AccountStore = map[string]string{}
-var CookieStore = map[string]string{}
 
 func SignUpHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -25,17 +20,10 @@ func SignUpHandler() http.Handler {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
-		if len(username) == 0 || len(password) == 0 {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		if err := AccountStore.AddUser(username, password); err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-
-		if _, ok := AccountStore[username]; ok {
-			http.Error(w, "Account already exists", http.StatusUnauthorized)
-			return
-		}
-
-		AccountStore[username] = password
 
 		fmt.Fprintf(w, "Welcome %s, you can now login\n", username)
 	})
@@ -51,19 +39,15 @@ func SignInHandler() http.Handler {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
-		if len(username) == 0 || len(password) == 0 {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
+		if err := AccountStore.CheckUser(username, password); err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 		}
 
-		if password != AccountStore[username] {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sessionId, err := SessionStore.Add(username)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-
-		sessionId := uuid.New().String()
-
-		CookieStore[sessionId] = username
 
 		http.SetCookie(w, &http.Cookie{Name: "session-id", Value: sessionId})
 
@@ -79,13 +63,11 @@ func SignOutHandler() http.Handler {
 			return
 		}
 
-		username, ok := CookieStore[sessionId.Value]
-		if !ok {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		username, err := SessionStore.Del(sessionId.Value)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-
-		delete(CookieStore, sessionId.Value)
 
 		fmt.Fprintf(w, "See ya, %s\n", username)
 	})
@@ -99,9 +81,9 @@ func MustAuth(h http.Handler) http.Handler {
 			return
 		}
 
-		username, ok := CookieStore[sessionId.Value]
-		if !ok {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		username, err := SessionStore.Get(sessionId.Value)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 

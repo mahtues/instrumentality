@@ -2,6 +2,10 @@
 
 COOKIE_FILE=/tmp/cookies
 
+# root
+curl -i http://localhost/
+echo ---
+
 # create account
 curl -i -X POST -d 'username=matheus&password=root' http://localhost/signup
 echo ---
