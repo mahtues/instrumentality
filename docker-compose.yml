@@ -5,7 +5,18 @@ services:
         image: redis:latest
 
     mongodb:
-        image: mongo:latest
+        image: mongo
+        ports:
+            - 27017:27017
+        volumes:
+            - mongodbdata:/data/db
+
+    mongo-express:
+        image: mongo-express
+        ports:
+            - 8081:8081
+        environment:
+            ME_CONFIG_MONGODB_SERVER: mongodb
 
     mariadb:
         image: mariadb:latest
@@ -13,12 +24,13 @@ services:
             MYSQL_ROOT_PASSWORD: root
 
     adminer:
-        image: adminer:latest
+        image: dockette/adminer
         ports:
-            - 8080:8080
+            - 8080:80
         environment:
             ADMINER_DESIGN: pepa-linha
-
+            ADMINER_PLUGINS: mongodb
+    
     elasticsearch:
         image: elasticsearch:7.3.1
         environment:
@@ -42,3 +54,6 @@ services:
             - ELASTIC_APM_SERVER_URL=http://apmserver:8200
             - ELASTIC_APM_SERVICE_NAME=app
             - ELASTIC_APM_ENVIRONMENT=docker
+
+volumes:
+    mongodbdata:

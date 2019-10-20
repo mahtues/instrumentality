@@ -18,6 +18,8 @@ func main() {
 	mux.Handle("/signout", SignOutHandler())
 
 	mux.Handle("/home", MustAuth(HomeHandler()))
+
+	mux.Handle("/ping", PingHandler())
 	port := 80
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), apmhttp.Wrap(mux)); err != nil {
