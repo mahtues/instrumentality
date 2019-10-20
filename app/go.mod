@@ -1,4 +1,4 @@
-module github.com/kingnido/instrumentality
+module github.com/kingnido/instrumentality/app
 
 go 1.12
 
