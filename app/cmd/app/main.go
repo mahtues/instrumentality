@@ -8,15 +8,15 @@ import (
 
 	"go.elastic.co/apm/module/apmhttp"
 
-	"github.com/kingnido/instrumentality/app/pkg/account"
+	"github.com/kingnido/instrumentality/app/pkg/api"
 )
 
 func main() {
 	mux := http.NewServeMux()
 
 	mux.Handle("/", HelloHandler())
-	mux.Handle("/signup", account.SignUpHandler())
-	mux.Handle("/signin", account.SignInHandler())
+	mux.Handle("/signup", api.SignUpHandler())
+	mux.Handle("/signin", api.SignInHandler())
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", 80), apmhttp.Wrap(mux)); err != nil {
 		log.Fatal(err)
