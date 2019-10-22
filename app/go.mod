@@ -17,6 +17,7 @@ require (
 	github.com/klauspost/asmfmt v1.2.1 // indirect
 	github.com/koron/iferr v0.0.0-20180615142939-bb332a3b1d91 // indirect
 	github.com/nsf/gocode v0.0.0-20190302080247-5bee97b48836 // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/rogpeppe/godef v1.1.1 // indirect
 	github.com/zmb3/gogetdoc v0.0.0-20190228002656-b37376c5da6a // indirect
 	go.elastic.co/apm/module/apmhttp v1.5.0

@@ -10,6 +10,10 @@ echo ---
 curl -i -X POST -d 'username=matheus&password=root' http://localhost/signup
 echo ---
 
+# sign in with wrong password
+curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=wrong' http://localhost/signin
+echo ---
+
 # sign in
 curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=root' http://localhost/signin
 echo ---
