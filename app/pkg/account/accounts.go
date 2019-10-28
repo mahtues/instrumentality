@@ -12,12 +12,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AccountModel struct {
-	Username string
-	Hash     string
+type MongoModel struct {
+	Username string `bson:"username"`
+	Hash     string `bson:"hash"`
+	Email    string `bson:"email"`
 }
 
-type AccountForm struct {
+type CreateForm struct {
+	Username string
+	Password string
+	Email    string
+}
+
+type VerifyForm struct {
 	Username string
 	Password string
 }
@@ -35,7 +42,7 @@ func getCollection(ctx context.Context) (*mongo.Collection, error) {
 	return client.Database("instrumentality").Collection("accounts"), err
 }
 
-func Create(ctx context.Context, form AccountForm) error {
+func Create(ctx context.Context, form CreateForm) error {
 	accounts, err := getCollection(ctx)
 	if err != nil {
 		log.Println("connect error:", err.Error())
@@ -47,22 +54,29 @@ func Create(ctx context.Context, form AccountForm) error {
 		return err
 	}
 
-	account := AccountModel{Username: form.Username, Hash: string(hash)}
+	account := MongoModel{Username: form.Username, Hash: string(hash), Email: form.Email}
+
+	_, err = accounts.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.M{"username": 1}, Options: options.Index().SetUnique(true)})
+	if err != nil {
+		return err
+	}
 
 	_, err = accounts.InsertOne(ctx, account)
 
 	return err
 }
 
-func Verify(ctx context.Context, form AccountForm) error {
+func Verify(ctx context.Context, form VerifyForm) error {
 	accounts, err := getCollection(ctx)
 	if err != nil {
 		log.Println("connect error:", err.Error())
 		return err
 	}
 
-	var account AccountModel
-	if err := accounts.FindOne(ctx, bson.M{"username": form.Username}).Decode(&account); err != nil {
+	filter := bson.D{{"username", form.Username}}
+
+	var account MongoModel
+	if err := accounts.FindOne(ctx, filter).Decode(&account); err != nil {
 		return errors.Wrap(err, "invalid username")
 	}
 

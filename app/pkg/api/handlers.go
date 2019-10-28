@@ -8,20 +8,32 @@ import (
 	"github.com/pkg/errors"
 )
 
-func formFromRequest(r *http.Request) (account.AccountForm, error) {
+func createFormFromRequest(r *http.Request) (account.CreateForm, error) {
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	email := r.FormValue("email")
+
+	if len(username) == 0 || len(password) == 0 || len(email) == 0 {
+		return account.CreateForm{}, errors.New("missing username or password")
+	}
+
+	return account.CreateForm{Username: username, Password: password, Email: email}, nil
+}
+
+func verifyFormFromRequest(r *http.Request) (account.VerifyForm, error) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
 	if len(username) == 0 || len(password) == 0 {
-		return account.AccountForm{}, errors.New("missing username or password")
+		return account.VerifyForm{}, errors.New("missing username or password")
 	}
 
-	return account.AccountForm{Username: username, Password: password}, nil
+	return account.VerifyForm{Username: username, Password: password}, nil
 }
 
 func SignUpHandler() http.Handler {
 	return MustMethod(http.MethodPost, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		form, err := formFromRequest(r)
+		form, err := createFormFromRequest(r)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
@@ -38,7 +50,7 @@ func SignUpHandler() http.Handler {
 
 func SignInHandler() http.Handler {
 	return MustMethod(http.MethodPost, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		form, err := formFromRequest(r)
+		form, err := verifyFormFromRequest(r)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return

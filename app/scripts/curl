@@ -7,7 +7,7 @@ curl -i http://localhost/
 echo ---
 
 # create account
-curl -i -X POST -d 'username=matheus&password=root' http://localhost/signup
+curl -i -X POST -d 'username=matheus&password=root&email=fake@asd.com' http://localhost/signup
 echo ---
 
 # sign in with wrong password
