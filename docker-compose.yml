@@ -17,19 +17,6 @@ services:
             - 8081:8081
         environment:
             ME_CONFIG_MONGODB_SERVER: mongodb
-
-    mariadb:
-        image: mariadb:latest
-        environment:
-            MYSQL_ROOT_PASSWORD: root
-
-    adminer:
-        image: dockette/adminer
-        ports:
-            - 8080:80
-        environment:
-            ADMINER_DESIGN: pepa-linha
-            ADMINER_PLUGINS: mongodb
     
     elasticsearch:
         image: elasticsearch:7.3.1
@@ -44,15 +31,13 @@ services:
     apmserver:
         image: docker.elastic.co/apm/apm-server:7.3.1
 
-    app:
-        build:
-            context: ./app
-            dockerfile: ./build/Dockerfile
+    instrumentality:
+        build: .
         ports:
-            - 80:80
+            - 8080:8080
         environment:
             - ELASTIC_APM_SERVER_URL=http://apmserver:8200
-            - ELASTIC_APM_SERVICE_NAME=app
+            - ELASTIC_APM_SERVICE_NAME=instrumentality
             - ELASTIC_APM_ENVIRONMENT=docker
 
 volumes:

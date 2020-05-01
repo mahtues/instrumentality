@@ -8,13 +8,13 @@ import (
 
 	"go.elastic.co/apm/module/apmhttp"
 
-	"github.com/kingnido/instrumentality/app/pkg/api"
+	"github.com/kingnido/instrumentality/api"
 )
 
 func main() {
 	mux := http.NewServeMux()
 
-	mux.Handle("/", HelloHandler())
+	mux.Handle("/", helloHandler())
 	mux.Handle("/signup", api.SignUpHandler())
 	mux.Handle("/signin", api.SignInHandler())
 
@@ -23,7 +23,7 @@ func main() {
 	}
 }
 
-func HelloHandler() http.Handler {
+func helloHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "hello from app\n")
 	})
