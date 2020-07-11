@@ -8,7 +8,7 @@ import (
 
 	"go.elastic.co/apm/module/apmhttp"
 
-	"github.com/kingnido/instrumentality/app/pkg/api"
+	"github.com/kingnido/instrumentality/pkg/api"
 )
 
 func main() {

@@ -42,6 +42,8 @@ github.com/jstemmer/gotags v1.4.1 h1:aWIyXsU3lTDqhsEC49MP85p2cUUWr2ptvdGNqqGA3r4
 github.com/jstemmer/gotags v1.4.1/go.mod h1:b6J3X0bsLbR4C5SgSx3V3KjuWTtmRzcmWPbTkWZ49PA=
 github.com/kingnido/instrumentality v0.0.0-20191014013403-3aa8b290b17b h1:8iFHrdhHAuaux2sYYFU9Bbi7OtKgbrjGSyE/q8R4/L4=
 github.com/kingnido/instrumentality/app v0.0.0-20191014013403-3aa8b290b17b h1:D3Wyje65o8jRJpxfegYJMwqFD3gObif/FpzMnrLFxOs=
+github.com/kingnido/instrumentality/app v0.0.0-20200501171555-5408f3ecf4df h1:8BNAVSRjZs4IsYrZH9uZ17K4FLr7z3YXYOlY90QtdGo=
+github.com/kingnido/instrumentality/app v0.0.0-20200501171555-5408f3ecf4df/go.mod h1:Qq3Zevnzaok4GYSQQldqeeIynSAoFx3liLtAe5Hkabs=
 github.com/kisielk/errcheck v1.2.0 h1:reN85Pxc5larApoH1keMBiu2GWtPqXQ1nc9gx+jOU+E=
 github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQLJ+jE2L00=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=

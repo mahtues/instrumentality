@@ -1,4 +1,4 @@
-module github.com/kingnido/instrumentality/app
+module github.com/kingnido/instrumentality
 
 go 1.12
 
@@ -13,6 +13,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/josharian/impl v0.0.0-20190715203526-f0d59e96e372 // indirect
 	github.com/jstemmer/gotags v1.4.1 // indirect
+	github.com/kingnido/instrumentality/app v0.0.0-20200501171555-5408f3ecf4df
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/klauspost/asmfmt v1.2.1 // indirect
 	github.com/koron/iferr v0.0.0-20180615142939-bb332a3b1d91 // indirect
