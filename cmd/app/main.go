@@ -18,7 +18,7 @@ func main() {
 	mux.Handle("/signup", api.SignUpHandler())
 	mux.Handle("/signin", api.SignInHandler())
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", 8080), apmhttp.Wrap(mux)); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", 80), apmhttp.Wrap(mux)); err != nil {
 		log.Fatal(err)
 	}
 }

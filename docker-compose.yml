@@ -37,11 +37,9 @@ services:
         image: docker.elastic.co/apm/apm-server:7.3.1
 
     instrumentality:
-        build:
-            context: .
-            dockerfile: ./build/Dockerfile
+        build: .
         ports:
-            - 80:8080
+            - 80:80
         environment:
             - ELASTIC_APM_SERVER_URL=http://apmserver:8200
             - ELASTIC_APM_SERVICE_NAME=app
