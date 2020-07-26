@@ -31,7 +31,7 @@ func verifyFormFromRequest(r *http.Request) (account.VerifyForm, error) {
 	return account.VerifyForm{Username: username, Password: password}, nil
 }
 
-func SignUpHandler() http.Handler {
+func SignUpHandler(creater account.Creater) http.Handler {
 	return MustMethod(http.MethodPost, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		form, err := createFormFromRequest(r)
 		if err != nil {
@@ -39,7 +39,7 @@ func SignUpHandler() http.Handler {
 			return
 		}
 
-		if err := account.Create(r.Context(), form); err != nil {
+		if err := creater.Create(r.Context(), form); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -48,7 +48,7 @@ func SignUpHandler() http.Handler {
 	}))
 }
 
-func SignInHandler() http.Handler {
+func SignInHandler(verifier account.Verifier) http.Handler {
 	return MustMethod(http.MethodPost, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		form, err := verifyFormFromRequest(r)
 		if err != nil {
@@ -56,7 +56,7 @@ func SignInHandler() http.Handler {
 			return
 		}
 
-		if err := account.Verify(r.Context(), form); err != nil {
+		if err := verifier.Verify(r.Context(), form); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
