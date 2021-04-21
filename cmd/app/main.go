@@ -8,23 +8,23 @@ import (
 
 	"go.elastic.co/apm/module/apmhttp"
 
-	"github.com/kingnido/instrumentality/pkg/account"
-	"github.com/kingnido/instrumentality/pkg/api"
+	"github.com/kingnido/instrumentality/api"
 )
 
 func main() {
 	mux := http.NewServeMux()
 
-	mux.Handle("/", HelloHandler())
-	mux.Handle("/signup", api.SignUpHandler(account.DefaultCreater()))
-	mux.Handle("/signin", api.SignInHandler(account.DefaultVerifier()))
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", 80), apmhttp.Wrap(mux)); err != nil {
+	mux.Handle("/", helloHandler())
+	mux.Handle("/signup", api.SignUpHandler())
+	mux.Handle("/signin", api.SignInHandler())
+
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", 8080), apmhttp.Wrap(mux)); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func HelloHandler() http.Handler {
+func helloHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "hello from app\n")
 	})

@@ -1,30 +1,31 @@
 #!/usr/bin/env bash
 
 COOKIE_FILE=/tmp/cookies
+HOST_URL=http://localhost:8080
 
 # root
-curl -i http://localhost/
+curl -i $HOST_URL/
 echo ---
 
 # create account
-curl -i -X POST -d 'username=matheus&password=root&email=fake@asd.com' http://localhost/signup
+curl -i -X POST -d 'username=matheus&password=root&email=fake@asd.com' $HOST_URL/signup
 echo ---
 
 # sign in with wrong password
-curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=wrong' http://localhost/signin
+curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=wrong' $HOST_URL/signin
 echo ---
 
 # sign in
-curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=root' http://localhost/signin
+curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=root' $HOST_URL/signin
 echo ---
 
 # home
-curl -i -b ${COOKIE_FILE} -X GET http://localhost/home
+curl -i -b ${COOKIE_FILE} -X GET $HOST_URL/home
 echo ---
 
 # sign out
-curl -i -b ${COOKIE_FILE} -X GET http://localhost/signout
+curl -i -b ${COOKIE_FILE} -X GET $HOST_URL/signout
 echo ---
 
 # home
-curl -i -b ${COOKIE_FILE} -X GET http://localhost/home
+curl -i -b ${COOKIE_FILE} -X GET $HOST_URL/home

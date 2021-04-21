@@ -8,8 +8,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o instrumentality ./cmd/app
+RUN go build ./cmd/...
 
 EXPOSE 80
 
-CMD ./instrumentality
+CMD ./app
