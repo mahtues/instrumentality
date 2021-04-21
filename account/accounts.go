@@ -30,7 +30,7 @@ type VerifyForm struct {
 }
 
 func getClient(ctx context.Context) (*mongo.Client, error) {
-	return mongo.Connect(ctx, options.Client().ApplyURI("mongodb://192.168.99.100:27017"))
+	return mongo.Connect(ctx, options.Client().ApplyURI("mongodb://mongodb:27017"))
 }
 
 func getCollection(ctx context.Context) (*mongo.Collection, error) {
