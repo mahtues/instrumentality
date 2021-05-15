@@ -39,6 +39,7 @@ services:
             - ELASTIC_APM_SERVER_URL=http://apmserver:8200
             - ELASTIC_APM_SERVICE_NAME=instrumentality
             - ELASTIC_APM_ENVIRONMENT=docker
+            - MONGODB_HOST=mongodb://mongodb:27017
 
 volumes:
     mongodbdata:
