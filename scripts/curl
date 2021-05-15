@@ -3,20 +3,22 @@
 COOKIE_FILE=/tmp/cookies
 HOST_URL=http://localhost:8080
 
+USERNAME=matheus$RANDOM$RANDOM$RANDOM$RANDOM
+
 # root
 curl -i $HOST_URL/
 echo ---
 
 # create account
-curl -i -X POST -d 'username=matheus&password=root&email=fake@asd.com' $HOST_URL/signup
+curl -i -X POST -d "username=$USERNAME&password=root&email=fake@asd.com" $HOST_URL/signup
 echo ---
 
 # sign in with wrong password
-curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=wrong' $HOST_URL/signin
+curl -i -c ${COOKIE_FILE} -X POST -d "username=$USERNAME&password=wrong" $HOST_URL/signin
 echo ---
 
 # sign in
-curl -i -c ${COOKIE_FILE} -X POST -d 'username=matheus&password=root' $HOST_URL/signin
+curl -i -c ${COOKIE_FILE} -X POST -d "username=$USERNAME&password=root" $HOST_URL/signin
 echo ---
 
 # home
