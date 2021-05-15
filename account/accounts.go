@@ -19,14 +19,14 @@ type MongoModel struct {
 }
 
 type CreateForm struct {
-	Username string
-	Password string
-	Email    string
+	Username string `form:"username"`
+	Password string `form:"password"`
+	Email    string `form:"email"`
 }
 
 type VerifyForm struct {
-	Username string
-	Password string
+	Username string `form:"username"`
+	Password string `form:"password"`
 }
 
 func getClient(ctx context.Context) (*mongo.Client, error) {

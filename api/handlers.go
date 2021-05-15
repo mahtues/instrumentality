@@ -4,31 +4,37 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/mahtues/form"
 	"github.com/mahtues/instrumentality/account"
 	"github.com/pkg/errors"
 )
 
 func createFormFromRequest(r *http.Request) (account.CreateForm, error) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	email := r.FormValue("email")
+	createForm := account.CreateForm{}
 
-	if len(username) == 0 || len(password) == 0 || len(email) == 0 {
+	if err := form.Unmarshal(r, &createForm); err != nil {
+		return account.CreateForm{}, err
+	}
+
+	if len(createForm.Username) == 0 || len(createForm.Password) == 0 || len(createForm.Email) == 0 {
 		return account.CreateForm{}, errors.New("missing username or password")
 	}
 
-	return account.CreateForm{Username: username, Password: password, Email: email}, nil
+	return createForm, nil
 }
 
 func verifyFormFromRequest(r *http.Request) (account.VerifyForm, error) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	verifyForm := account.VerifyForm{}
 
-	if len(username) == 0 || len(password) == 0 {
+	if err := form.Unmarshal(r, &verifyForm); err != nil {
+		return account.VerifyForm{}, err
+	}
+
+	if len(verifyForm.Username) == 0 || len(verifyForm.Password) == 0 {
 		return account.VerifyForm{}, errors.New("missing username or password")
 	}
 
-	return account.VerifyForm{Username: username, Password: password}, nil
+	return verifyForm, nil
 }
 
 func SignUpHandler() http.Handler {
