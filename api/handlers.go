@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/kingnido/instrumentality/account"
+	"github.com/mahtues/instrumentality/account"
 	"github.com/pkg/errors"
 )
 

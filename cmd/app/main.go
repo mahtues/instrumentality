@@ -8,12 +8,11 @@ import (
 
 	"go.elastic.co/apm/module/apmhttp"
 
-	"github.com/kingnido/instrumentality/api"
+	"github.com/mahtues/instrumentality/api"
 )
 
 func main() {
 	mux := http.NewServeMux()
-
 
 	mux.Handle("/", helloHandler())
 	mux.Handle("/signup", api.SignUpHandler())
