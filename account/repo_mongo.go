@@ -8,6 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"go.elastic.co/apm/module/apmmongo"
 )
 
 type MongoAccount struct {
@@ -23,7 +25,7 @@ type MongoRepository struct {
 }
 
 func NewMongoRepository(ctx context.Context) (*MongoRepository, error) {
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_HOST")))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_HOST")).SetMonitor(apmmongo.CommandMonitor()))
 	if err != nil {
 		return nil, err
 	}
