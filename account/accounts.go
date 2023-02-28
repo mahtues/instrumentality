@@ -18,14 +18,14 @@ type Account struct {
 }
 
 type CreateForm struct {
-	Username string `form:"username"`
-	Password string `form:"password"`
-	Email    string `form:"email"`
+	Username string
+	Password string
+	Email    string
 }
 
 type VerifyForm struct {
-	Username string `form:"username"`
-	Password string `form:"password"`
+	Username string
+	Password string
 }
 
 var defaultRepository, repoErr = NewMongoRepository(context.Background())
