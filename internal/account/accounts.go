@@ -18,9 +18,9 @@ type Account struct {
 }
 
 type CreateForm struct {
-	Username string `form:Username`
-	Password string `form:Password`
-	Email    string `form:Email`
+	Username string `form:"Username"`
+	Password string `form:"Password"`
+	Email    string `form:"Email"`
 }
 
 type VerifyForm struct {
