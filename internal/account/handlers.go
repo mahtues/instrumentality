@@ -1,37 +1,36 @@
-package api
+package account
 
 import (
 	"fmt"
 	"net/http"
 
 	"github.com/mahtues/form"
-	"github.com/mahtues/instrumentality/account"
 	"github.com/pkg/errors"
 )
 
-func createFormFromRequest(r *http.Request) (account.CreateForm, error) {
-	createForm := account.CreateForm{}
+func createFormFromRequest(r *http.Request) (CreateForm, error) {
+	createForm := CreateForm{}
 
 	if err := form.Unmarshal(r, &createForm); err != nil {
-		return account.CreateForm{}, err
+		return CreateForm{}, err
 	}
 
 	if len(createForm.Username) == 0 || len(createForm.Password) == 0 || len(createForm.Email) == 0 {
-		return account.CreateForm{}, errors.New("missing username or password")
+		return CreateForm{}, errors.New("missing username or password")
 	}
 
 	return createForm, nil
 }
 
-func verifyFormFromRequest(r *http.Request) (account.VerifyForm, error) {
-	verifyForm := account.VerifyForm{}
+func verifyFormFromRequest(r *http.Request) (VerifyForm, error) {
+	verifyForm := VerifyForm{}
 
 	if err := form.Unmarshal(r, &verifyForm); err != nil {
-		return account.VerifyForm{}, err
+		return VerifyForm{}, err
 	}
 
 	if len(verifyForm.Username) == 0 || len(verifyForm.Password) == 0 {
-		return account.VerifyForm{}, errors.New("missing username or password")
+		return VerifyForm{}, errors.New("missing username or password")
 	}
 
 	return verifyForm, nil
@@ -45,7 +44,7 @@ func SignUpHandler() http.Handler {
 			return
 		}
 
-		if err := account.Create(r.Context(), form); err != nil {
+		if err := Create(r.Context(), form); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -62,7 +61,7 @@ func SignInHandler() http.Handler {
 			return
 		}
 
-		if err := account.Verify(r.Context(), form); err != nil {
+		if err := Verify(r.Context(), form); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

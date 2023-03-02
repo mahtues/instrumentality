@@ -18,9 +18,9 @@ type Account struct {
 }
 
 type CreateForm struct {
-	Username string
-	Password string
-	Email    string
+	Username string `form:Username`
+	Password string `form:Password`
+	Email    string `form:Email`
 }
 
 type VerifyForm struct {
@@ -63,4 +63,7 @@ func Verify(ctx context.Context, form VerifyForm) error {
 	}
 
 	return nil
+}
+
+type Service interface {
 }
