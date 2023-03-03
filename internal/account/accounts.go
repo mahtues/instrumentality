@@ -4,8 +4,24 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type Service struct {
+	repository Repository
+}
+
+func New(mongo *mongo.Client) (Service, error) {
+	repository, err := NewMongoRepository(mongo)
+	if err != nil {
+		return Service{}, errors.Wrap(err, "error creating repository")
+	}
+
+	return Service{
+		repository: repository,
+	}, nil
+}
 
 type Username string
 type Hash string
@@ -23,17 +39,7 @@ type CreateForm struct {
 	Email    string `form:"Email"`
 }
 
-type VerifyForm struct {
-	Username string
-	Password string
-}
-
-var defaultRepository, repoErr = NewMongoRepository(context.Background())
-
-func Create(ctx context.Context, form CreateForm) error {
-	if defaultRepository == nil {
-		return errors.Wrap(repoErr, "missing repository")
-	}
+func (s Service) Create(ctx context.Context, form CreateForm) error {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.MinCost)
 	if err != nil {
@@ -42,18 +48,19 @@ func Create(ctx context.Context, form CreateForm) error {
 
 	account := Account{Username: Username(form.Username), Hash: Hash(hash), Email: Email(form.Email)}
 
-	return defaultRepository.Create(ctx, account)
+	return s.repository.Create(ctx, account)
 }
 
-func Verify(ctx context.Context, form VerifyForm) error {
-	if defaultRepository == nil {
-		return errors.Wrap(repoErr, "missing repository")
-	}
+type VerifyForm struct {
+	Username string
+	Password string
+}
 
+func (s Service) Verify(ctx context.Context, form VerifyForm) error {
 	var account Account
 	var err error
 
-	if account, err = defaultRepository.FindByUsername(ctx, Username(form.Username)); err != nil {
+	if account, err = s.repository.FindByUsername(ctx, Username(form.Username)); err != nil {
 		return err
 	}
 
@@ -63,7 +70,4 @@ func Verify(ctx context.Context, form VerifyForm) error {
 	}
 
 	return nil
-}
-
-type Service interface {
 }

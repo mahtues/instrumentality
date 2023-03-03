@@ -2,14 +2,10 @@ package account
 
 import (
 	"context"
-	"os"
-
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"go.elastic.co/apm/module/apmmongo"
 )
 
 type MongoAccount struct {
@@ -24,17 +20,12 @@ type MongoRepository struct {
 	collection *mongo.Collection
 }
 
-func NewMongoRepository(ctx context.Context) (*MongoRepository, error) {
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_HOST")).SetMonitor(apmmongo.CommandMonitor()))
-	if err != nil {
-		return nil, err
-	}
+func NewMongoRepository(client *mongo.Client) (*MongoRepository, error) {
 	database := client.Database("instrumentality")
 	collection := database.Collection("accounts")
 
-	_, err = collection.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.M{"username": 1}, Options: options.Index().SetUnique(true)})
+	_, err := collection.Indexes().CreateOne(context.Background(), mongo.IndexModel{Keys: bson.M{"username": 1}, Options: options.Index().SetUnique(true)})
 	if err != nil {
-		// todo: disconnect
 		return nil, err
 	}
 
