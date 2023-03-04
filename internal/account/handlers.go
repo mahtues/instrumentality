@@ -18,35 +18,35 @@ func InitializeHandlers(mux *http.ServeMux, service Service) error {
 
 func signUpHandler(service Service) http.Handler {
 	return MustMethod(http.MethodPost, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		form, err := createFormFromRequest(r)
+		frm, err := createFormFromRequest(r)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
-		if err := service.Create(r.Context(), form); err != nil {
+		if err := service.Create(r.Context(), frm); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Fprintf(w, "Welcome, %s.\n", form.Username)
+		fmt.Fprintf(w, "Welcome, %s.\n", frm.Username)
 	}))
 }
 
 func signInHandler(service Service) http.Handler {
 	return MustMethod(http.MethodPost, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		form, err := verifyFormFromRequest(r)
+		frm, err := verifyFormFromRequest(r)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
-		if err := service.Verify(r.Context(), form); err != nil {
+		if err := service.Verify(r.Context(), frm); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Fprintf(w, "Welcome back, %s.\n", form.Username)
+		fmt.Fprintf(w, "Welcome back, %s.\n", frm.Username)
 	}))
 }
 

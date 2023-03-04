@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/mahtues/instrumentality/internal/account/concrete"
 	"net/http"
 	"os"
 
@@ -19,7 +20,7 @@ type Config struct {
 }
 
 type Services struct {
-	Account account.Service
+	Account *concrete.AccountImpl
 }
 
 type Resources struct {
@@ -48,8 +49,12 @@ func NewServer(config Config) (Server, error) {
 	}
 
 	// initialize services
-	if err := server.InitResources(); err != nil {
+	if err := server.InitServices(); err != nil {
 		return Server{}, errors.Wrap(err, "error initializing services")
+	}
+
+	if err := server.InjectServices(); err != nil {
+		return Server{}, errors.Wrap(err, "error injecting services into other services")
 	}
 
 	// initialize handlers
@@ -75,11 +80,15 @@ func (s Server) InitResources() error {
 func (s Server) InitServices() error {
 	var err error
 
-	s.Services.Account, err = account.New(s.Resources.Mongo)
+	s.Services.Account, err = concrete.New(s.Resources.Mongo)
 	if err != nil {
 		return errors.Wrap(err, "error initializing account service")
 	}
 
+	return nil
+}
+
+func (s Server) InjectServices() error {
 	return nil
 }
 
