@@ -10,15 +10,15 @@ curl -i $HOST_URL/
 echo ---
 
 # create account
-curl -i -X POST -d "username=$USERNAME&password=root&email=fake@asd.com" $HOST_URL/signup
+curl -i -X POST -d "username=$USERNAME&password=root&email=fake@asd.com" $HOST_URL/auth/signup
 echo ---
 
 # sign in with wrong password
-curl -i -c ${COOKIE_FILE} -X POST -d "username=$USERNAME&password=wrong" $HOST_URL/signin
+curl -i -c ${COOKIE_FILE} -X POST -d "username=$USERNAME&password=wrong" $HOST_URL/auth/signin
 echo ---
 
 # sign in
-curl -i -c ${COOKIE_FILE} -X POST -d "username=$USERNAME&password=root" $HOST_URL/signin
+curl -i -c ${COOKIE_FILE} -X POST -d "username=$USERNAME&password=root" $HOST_URL/auth/signin
 echo ---
 
 # home
@@ -26,7 +26,7 @@ curl -i -b ${COOKIE_FILE} -X GET $HOST_URL/home
 echo ---
 
 # sign out
-curl -i -b ${COOKIE_FILE} -X GET $HOST_URL/signout
+curl -i -b ${COOKIE_FILE} -X GET $HOST_URL/auth/signout
 echo ---
 
 # home

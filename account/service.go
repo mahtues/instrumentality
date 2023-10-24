@@ -1,4 +1,4 @@
-package concrete
+package account
 
 import (
 	"context"
@@ -6,8 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
-
-	"github.com/mahtues/instrumentality/internal/account"
 )
 
 type AccountImpl struct {
@@ -25,27 +23,27 @@ func New(mongo *mongo.Client) (*AccountImpl, error) {
 	}, nil
 }
 
-func (s *AccountImpl) Create(ctx context.Context, form account.CreateForm) error {
+func (s *AccountImpl) Create(ctx context.Context, form CreateForm) error {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.MinCost)
 	if err != nil {
 		return err
 	}
 
-	acc := account.Account{
-		Username: account.Username(form.Username),
-		Hash:     account.Hash(hash),
-		Email:    account.Email(form.Email),
+	acc := Account{
+		Username: Username(form.Username),
+		Hash:     Hash(hash),
+		Email:    Email(form.Email),
 	}
 
 	return s.repository.Create(ctx, acc)
 }
 
-func (s *AccountImpl) Verify(ctx context.Context, form account.VerifyForm) error {
-	var acc account.Account
+func (s *AccountImpl) Verify(ctx context.Context, form VerifyForm) error {
+	var acc Account
 	var err error
 
-	if acc, err = s.repository.FindByUsername(ctx, account.Username(form.Username)); err != nil {
+	if acc, err = s.repository.FindByUsername(ctx, Username(form.Username)); err != nil {
 		return err
 	}
 

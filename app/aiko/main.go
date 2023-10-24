@@ -7,7 +7,7 @@ import (
 
 	"go.elastic.co/apm/module/apmhttp"
 
-	"github.com/mahtues/instrumentality/internal/server"
+	"github.com/mahtues/instrumentality/server"
 )
 
 func main() {
