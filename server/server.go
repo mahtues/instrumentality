@@ -14,60 +14,58 @@ import (
 	"github.com/mahtues/instrumentality/account"
 )
 
+// todo: make this one private?
 type Config struct {
 	Port int
 }
 
-type Services struct {
-	Account *account.AccountImpl
+type services struct {
+	account *account.Service
 }
 
-type Resources struct {
-	Mongo *mongo.Client
+type resources struct {
+	mongo *mongo.Client
 }
 
 type Server struct {
-	Config Config
-
-	Handler *http.ServeMux
-
-	Resources Resources
-
-	Services Services
+	config    Config
+	handler   *http.ServeMux
+	resources resources
+	services  services
 }
 
 func NewServer(config Config) (*Server, error) {
 	server := &Server{
-		Config:  config,
-		Handler: http.NewServeMux(),
+		config:  config,
+		handler: http.NewServeMux(),
 	}
 
 	// initialize resources
-	if err := server.InitResources(); err != nil {
+	if err := server.initResources(); err != nil {
 		return nil, errors.Wrap(err, "error initializing resources")
 	}
 
 	// initialize services
-	if err := server.InitServices(); err != nil {
+	if err := server.initServices(); err != nil {
 		return nil, errors.Wrap(err, "error initializing services")
 	}
 
-	if err := server.InjectServices(); err != nil {
+	if err := server.injectServices(); err != nil {
 		return nil, errors.Wrap(err, "error injecting services into other services")
 	}
 
 	// initialize handlers
-	if err := server.InitHandlers(); err != nil {
+	if err := server.initHandlers(); err != nil {
 		return nil, errors.Wrap(err, "error initializing handlers")
 	}
 
 	return server, nil
 }
 
-func (s *Server) InitResources() error {
+func (s *Server) initResources() error {
 	var err error
 
-	s.Resources.Mongo, err = mongo.Connect(context.Background(), options.Client().ApplyURI(os.Getenv("MONGODB_HOST")).SetMonitor(apmmongo.CommandMonitor()))
+	s.resources.mongo, err = mongo.Connect(context.Background(), options.Client().ApplyURI(os.Getenv("MONGODB_HOST")).SetMonitor(apmmongo.CommandMonitor()))
 	if err != nil {
 		return errors.Wrap(err, "error creating client for mongodb")
 	}
@@ -75,10 +73,10 @@ func (s *Server) InitResources() error {
 	return nil
 }
 
-func (s *Server) InitServices() error {
+func (s *Server) initServices() error {
 	var err error
 
-	s.Services.Account, err = account.New(s.Resources.Mongo)
+	s.services.account, err = account.New(s.resources.mongo)
 	if err != nil {
 		return errors.Wrap(err, "error initializing account service")
 	}
@@ -86,22 +84,22 @@ func (s *Server) InitServices() error {
 	return nil
 }
 
-func (s Server) InjectServices() error {
+func (s *Server) injectServices() error {
 	return nil
 }
 
-func (s Server) InitHandlers() error {
-	s.Handler.HandleFunc("/", s.helloHandlerFunc)
+func (s *Server) initHandlers() error {
+	s.handler.HandleFunc("/", s.helloHandlerFunc)
 
-	s.Handler.Handle("/auth/", account.NewHandler(s.Services.Account))
+	s.handler.Handle("/auth/", account.NewHandler(s.services.account))
 
 	return nil
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.Handler.ServeHTTP(w, r)
+	s.handler.ServeHTTP(w, r)
 }
 
 func (s *Server) helloHandlerFunc(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "hello from app running on port %d\n", s.Config.Port)
+	fmt.Fprintf(w, "hello from app running on port %d\n", s.config.Port)
 }

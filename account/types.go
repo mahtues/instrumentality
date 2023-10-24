@@ -2,7 +2,7 @@ package account
 
 import "context"
 
-type Service interface {
+type IService interface {
 	Create(ctx context.Context, form CreateForm) error
 	Verify(ctx context.Context, form VerifyForm) error
 }

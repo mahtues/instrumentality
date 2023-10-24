@@ -8,22 +8,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AccountImpl struct {
-	repository Repository
+type Service struct {
+	repository IRepository
 }
 
-func New(mongo *mongo.Client) (*AccountImpl, error) {
+func New(mongo *mongo.Client) (*Service, error) {
 	repository, err := NewMongoRepository(mongo)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating repository")
 	}
 
-	return &AccountImpl{
+	return &Service{
 		repository: repository,
 	}, nil
 }
 
-func (s *AccountImpl) Create(ctx context.Context, form CreateForm) error {
+func (s *Service) Create(ctx context.Context, form CreateForm) error {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.MinCost)
 	if err != nil {
@@ -39,7 +39,7 @@ func (s *AccountImpl) Create(ctx context.Context, form CreateForm) error {
 	return s.repository.Create(ctx, acc)
 }
 
-func (s *AccountImpl) Verify(ctx context.Context, form VerifyForm) error {
+func (s *Service) Verify(ctx context.Context, form VerifyForm) error {
 	var acc Account
 	var err error
 

@@ -10,18 +10,18 @@ import (
 
 type Handler struct {
 	mux     *http.ServeMux
-	service *AccountImpl
+	service *Service
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mux.ServeHTTP(w, r)
 }
 
-func NewHandler(service *AccountImpl) *Handler {
+func NewHandler(service *Service) *Handler {
 	return (&Handler{}).Init(service)
 }
 
-func (h *Handler) Init(service *AccountImpl) *Handler {
+func (h *Handler) Init(service *Service) *Handler {
 	h.mux = http.NewServeMux()
 
 	h.mux.HandleFunc("/auth/signup", h.signUp)
