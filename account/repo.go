@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type IRepository interface {
+type Repository interface {
 	Create(context.Context, Account) error
 	FindByUsername(context.Context, Username) (Account, error)
 	FindByEmail(context.Context, Email) (Account, error)

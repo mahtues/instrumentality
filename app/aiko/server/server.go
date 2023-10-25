@@ -18,19 +18,16 @@ type Config struct {
 	Port int
 }
 
-type services struct {
-	account *account.Service
-}
-
-type resources struct {
-	mongo *mongo.Client
-}
-
 type Server struct {
-	config    Config
-	handler   *http.ServeMux
-	resources resources
-	services  services
+	config Config
+
+	handler *http.ServeMux
+
+	mongo *mongo.Client
+
+	accountService    account.Service
+	accountRepository account.MongoRepository
+	accountHandler    account.Handler
 }
 
 func NewServer(config Config) (*Server, error) {
@@ -44,19 +41,18 @@ func NewServer(config Config) (*Server, error) {
 		return nil, errors.Wrap(err, "error initializing resources")
 	}
 
-	// initialize services
-	if err := server.initServices(); err != nil {
-		return nil, errors.Wrap(err, "error initializing services")
-	}
+	// initialize adapters
+	server.accountRepository.Inject(server.mongo)
 
-	if err := server.injectServices(); err != nil {
-		return nil, errors.Wrap(err, "error injecting services into other services")
-	}
+	// initialize services
+	server.accountService.Inject(&server.accountRepository)
 
 	// initialize handlers
-	if err := server.initHandlers(); err != nil {
-		return nil, errors.Wrap(err, "error initializing handlers")
-	}
+	server.accountHandler.Inject("/auth", &server.accountService)
+
+	// map sub routes
+	server.handler.HandleFunc("/", server.helloHandlerFunc)
+	server.handler.Handle("/auth/", &server.accountHandler)
 
 	return server, nil
 }
@@ -64,33 +60,10 @@ func NewServer(config Config) (*Server, error) {
 func (s *Server) initResources() error {
 	var err error
 
-	s.resources.mongo, err = mongo.Connect(context.Background(), options.Client().ApplyURI(os.Getenv("MONGODB_HOST")).SetMonitor(apmmongo.CommandMonitor()))
+	s.mongo, err = mongo.Connect(context.Background(), options.Client().ApplyURI(os.Getenv("MONGODB_HOST")).SetMonitor(apmmongo.CommandMonitor()))
 	if err != nil {
 		return errors.Wrap(err, "error creating client for mongodb")
 	}
-
-	return nil
-}
-
-func (s *Server) initServices() error {
-	var err error
-
-	s.services.account, err = account.New(s.resources.mongo)
-	if err != nil {
-		return errors.Wrap(err, "error initializing account service")
-	}
-
-	return nil
-}
-
-func (s *Server) injectServices() error {
-	return nil
-}
-
-func (s *Server) initHandlers() error {
-	s.handler.HandleFunc("/", s.helloHandlerFunc)
-
-	s.handler.Handle("/auth/", account.NewHandler(s.services.account))
 
 	return nil
 }

@@ -21,16 +21,20 @@ type MongoRepository struct {
 	collection *mongo.Collection
 }
 
-func NewMongoRepository(client *mongo.Client) (*MongoRepository, error) {
+func (r *MongoRepository) Inject(client *mongo.Client) error {
 	database := client.Database("instrumentality")
 	collection := database.Collection("accounts")
 
 	_, err := collection.Indexes().CreateOne(context.Background(), mongo.IndexModel{Keys: bson.M{"username": 1}, Options: options.Index().SetUnique(true)})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &MongoRepository{client, database, collection}, nil
+	r.client = client
+	r.database = database
+	r.collection = collection
+
+	return nil
 }
 
 func (m *MongoRepository) Create(ctx context.Context, account Account) error {

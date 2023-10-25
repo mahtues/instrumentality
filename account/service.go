@@ -4,27 +4,18 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
-	repository IRepository
+	repository Repository
 }
 
-func New(mongo *mongo.Client) (*Service, error) {
-	repository, err := NewMongoRepository(mongo)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating repository")
-	}
-
-	return &Service{
-		repository: repository,
-	}, nil
+func (s *Service) Inject(repository Repository) {
+	s.repository = repository
 }
 
 func (s *Service) Create(ctx context.Context, form CreateForm) error {
-
 	hash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.MinCost)
 	if err != nil {
 		return err

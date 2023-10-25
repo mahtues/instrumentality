@@ -1,45 +1,45 @@
 version: "3.7"
 
 services:
-    redis:
-        image: redis:latest
+  redis:
+    image: redis:latest
 
-    mongodb:
-        image: mongo
-        ports:
-            - 27017:27017
-        volumes:
-            - mongodbdata:/data/db
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodbdata:/data/db
 
-    mongo-express:
-        image: mongo-express
-        ports:
-            - 8081:8081
-        environment:
-            ME_CONFIG_MONGODB_SERVER: mongodb
+  mongo-express:
+    image: mongo-express:0.54.0
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
 
-    elasticsearch:
-        image: elasticsearch:7.3.1
-        environment:
-            - discovery.type=single-node
+  elasticsearch:
+    image: elasticsearch:7.3.1
+    environment:
+      - discovery.type=single-node
 
-    kibana:
-        image: kibana:7.3.1
-        ports:
-            - 5601:5601
-    
-    apmserver:
-        image: docker.elastic.co/apm/apm-server:7.3.1
+  kibana:
+    image: kibana:7.3.1
+    ports:
+      - 5601:5601
 
-    instrumentality:
-        build: .
-        ports:
-            - 8080:8080
-        environment:
-            - ELASTIC_APM_SERVER_URL=http://apmserver:8200
-            - ELASTIC_APM_SERVICE_NAME=instrumentality
-            - ELASTIC_APM_ENVIRONMENT=docker
-            - MONGODB_HOST=mongodb://mongodb:27017
+  apmserver:
+    image: docker.elastic.co/apm/apm-server:7.3.1
+
+  instrumentality:
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      - ELASTIC_APM_SERVER_URL=http://apmserver:8200
+      - ELASTIC_APM_SERVICE_NAME=instrumentality
+      - ELASTIC_APM_ENVIRONMENT=docker
+      - MONGODB_HOST=mongodb://mongodb:27017
 
 volumes:
-    mongodbdata:
+  mongodbdata:

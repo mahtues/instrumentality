@@ -10,6 +10,7 @@ import (
 
 type Handler struct {
 	mux     *http.ServeMux
+	prefix  string
 	service *Service
 }
 
@@ -17,15 +18,15 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mux.ServeHTTP(w, r)
 }
 
-func NewHandler(service *Service) *Handler {
-	return (&Handler{}).Init(service)
-}
-
-func (h *Handler) Init(service *Service) *Handler {
+func (h *Handler) Inject(prefix string, service *Service) *Handler {
 	h.mux = http.NewServeMux()
+	h.prefix = prefix
 
-	h.mux.HandleFunc("/auth/signup", h.signUp)
-	h.mux.HandleFunc("/auth/signin", h.signIn)
+	h.mux.HandleFunc(prefix+"/signup", h.signUp)
+
+	h.mux.HandleFunc(prefix+"/signin", mapMethodFunc(map[string]http.HandlerFunc{
+		http.MethodPost: h.signIn,
+	}))
 
 	h.service = service
 
@@ -66,20 +67,21 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	})(w, r)
 }
 
-func MustMethod(method string, next http.Handler) http.Handler {
+func MustMethodFunc(method string, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != method {
 			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		next(w, r)
 	})
 }
 
-func MustMethodFunc(method string, next http.HandlerFunc) http.HandlerFunc {
+func mapMethodFunc(methodMap map[string]http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != method {
+		next, ok := methodMap[r.Method]
+		if !ok {
 			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 			return
 		}
