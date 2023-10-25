@@ -14,7 +14,6 @@ import (
 	"github.com/mahtues/instrumentality/account"
 )
 
-// todo: make this one private?
 type Config struct {
 	Port int
 }
