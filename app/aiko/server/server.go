@@ -42,17 +42,25 @@ func NewServer(config Config) (*Server, error) {
 	}
 
 	// initialize adapters
-	server.accountRepository.Inject(server.mongo)
+	server.accountRepository.Inject(
+		server.mongo,
+	)
 
 	// initialize services
-	server.accountService.Inject(&server.accountRepository)
+	server.accountService.Inject(
+		&server.accountRepository,
+	)
 
 	// initialize handlers
-	server.accountHandler.Inject("/auth", &server.accountService)
+	server.accountHandler.Inject(
+		"/auth",
+		&server.accountService,
+	)
 
-	// map sub routes
-	server.handler.HandleFunc("/", server.helloHandlerFunc)
+	// map handlers
 	server.handler.Handle("/auth/", &server.accountHandler)
+
+	server.handler.HandleFunc("/", server.helloHandlerFunc)
 
 	return server, nil
 }
