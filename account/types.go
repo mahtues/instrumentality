@@ -1,6 +1,8 @@
 package account
 
-import "context"
+import (
+	"context"
+)
 
 type IService interface {
 	Create(ctx context.Context, form CreateForm) error

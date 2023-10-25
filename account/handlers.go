@@ -11,14 +11,14 @@ import (
 type Handler struct {
 	mux     *http.ServeMux
 	prefix  string
-	service *Service
+	service IService
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mux.ServeHTTP(w, r)
 }
 
-func (h *Handler) Inject(prefix string, service *Service) *Handler {
+func (h *Handler) Inject(prefix string, service IService) *Handler {
 	h.mux = http.NewServeMux()
 	h.prefix = prefix
 
@@ -34,7 +34,7 @@ func (h *Handler) Inject(prefix string, service *Service) *Handler {
 }
 
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
-	MustMethodFunc(http.MethodPost, func(w http.ResponseWriter, r *http.Request) {
+	mustMethodFunc(http.MethodPost, func(w http.ResponseWriter, r *http.Request) {
 		frm, err := createFormFromRequest(r)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -51,23 +51,21 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
-	MustMethodFunc(http.MethodPost, func(w http.ResponseWriter, r *http.Request) {
-		frm, err := verifyFormFromRequest(r)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
+	frm, err := verifyFormFromRequest(r)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 
-		if err := h.service.Verify(r.Context(), frm); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	if err := h.service.Verify(r.Context(), frm); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-		fmt.Fprintf(w, "Welcome back, %s.\n", frm.Username)
-	})(w, r)
+	fmt.Fprintf(w, "Welcome back, %s.\n", frm.Username)
 }
 
-func MustMethodFunc(method string, next http.HandlerFunc) http.HandlerFunc {
+func mustMethodFunc(method string, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != method {
 			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
