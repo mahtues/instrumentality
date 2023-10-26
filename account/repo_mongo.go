@@ -15,45 +15,6 @@ type MongoAccount struct {
 	Email    string `bson:"email"`
 }
 
-type MongoRepository struct {
-	client     *mongo.Client
-	database   *mongo.Database
-	collection *mongo.Collection
-}
-
-func (r *MongoRepository) Inject(client *mongo.Client) error {
-	database := client.Database("instrumentality")
-	collection := database.Collection("accounts")
-
-	_, err := collection.Indexes().CreateOne(context.Background(), mongo.IndexModel{Keys: bson.M{"username": 1}, Options: options.Index().SetUnique(true)})
-	if err != nil {
-		return err
-	}
-
-	r.client = client
-	r.database = database
-	r.collection = collection
-
-	return nil
-}
-
-func (m *MongoRepository) Create(ctx context.Context, account Account) error {
-	_, err := m.collection.InsertOne(ctx, encode(account))
-	return err
-}
-
-func (m *MongoRepository) FindByUsername(ctx context.Context, username Username) (Account, error) {
-	var mongoAccount MongoAccount
-	if err := m.collection.FindOne(ctx, bson.D{{"username", username}}).Decode(&mongoAccount); err != nil {
-		return Account{}, errors.Wrap(err, "invalid username")
-	}
-	return decode(mongoAccount), nil
-}
-
-func (m *MongoRepository) FindByEmail(_ context.Context, _ Email) (Account, error) {
-	panic("not implemented") // TODO: Implement
-}
-
 func encode(account Account) MongoAccount {
 	return MongoAccount{
 		Username: string(account.Username),
@@ -68,4 +29,47 @@ func decode(mongoAccount MongoAccount) Account {
 		Hash:     Hash(mongoAccount.Hash),
 		Email:    Email(mongoAccount.Email),
 	}
+}
+
+type MongoRepository struct {
+	client *mongo.Client
+}
+
+func (m *MongoRepository) Inject(client *mongo.Client) {
+	m.client = client
+}
+
+func (m *MongoRepository) Create(ctx context.Context, account Account) error {
+	collection := m.client.Database("instrumentality").Collection("accounts")
+	_, err := collection.InsertOne(ctx, encode(account))
+	return err
+}
+
+func (m *MongoRepository) FindByUsername(ctx context.Context, username Username) (Account, error) {
+	collection := m.client.Database("instrumentality").Collection("accounts")
+	var mongoAccount MongoAccount
+	if err := collection.FindOne(ctx, bson.D{{"username", username}}).Decode(&mongoAccount); err != nil {
+		return Account{}, errors.Wrap(err, "invalid username")
+	}
+	return decode(mongoAccount), nil
+}
+
+func (m *MongoRepository) FindByEmail(_ context.Context, _ Email) (Account, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (m *MongoRepository) createIndex() error {
+	collection := m.client.Database("instrumentality").Collection("accounts")
+	ctx := context.Background()
+	model := mongo.IndexModel{
+		Keys:    bson.M{"username": 1},
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err := collection.Indexes().CreateOne(ctx, model)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

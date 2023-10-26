@@ -8,8 +8,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build ./app/...
+RUN go build -o ./bin/ ./app/...
 
 EXPOSE 80
 
-CMD ./aiko
+CMD ./bin/aiko

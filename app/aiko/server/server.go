@@ -1,21 +1,20 @@
 package server
 
 import (
-	"context"
 	"fmt"
+	"log"
 	"net/http"
-	"os"
 
 	"github.com/pkg/errors"
-	"go.elastic.co/apm/module/apmmongo"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/mahtues/instrumentality/account"
+	"github.com/mahtues/instrumentality/zmisc"
 )
 
 type Config struct {
-	Port int
+	Port        string
+	MongoDbHost string
 }
 
 type Server struct {
@@ -37,9 +36,11 @@ func NewServer(config Config) (*Server, error) {
 	}
 
 	// initialize resources
+	log.Print("initializing resources")
 	if err := server.initResources(); err != nil {
 		return nil, errors.Wrap(err, "error initializing resources")
 	}
+	log.Print("resources initialized")
 
 	// initialize adapters
 	server.accountRepository.Inject(
@@ -68,7 +69,7 @@ func NewServer(config Config) (*Server, error) {
 func (s *Server) initResources() error {
 	var err error
 
-	s.mongo, err = mongo.Connect(context.Background(), options.Client().ApplyURI(os.Getenv("MONGODB_HOST")).SetMonitor(apmmongo.CommandMonitor()))
+	s.mongo, err = zmisc.NewMongoClient(s.config.MongoDbHost)
 	if err != nil {
 		return errors.Wrap(err, "error creating client for mongodb")
 	}
@@ -81,5 +82,5 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) helloHandlerFunc(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "hello from app running on port %d\n", s.config.Port)
+	fmt.Fprintf(w, "hello from app running on port %v\n", s.config.Port)
 }
