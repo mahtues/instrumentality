@@ -19,9 +19,8 @@ type Config struct {
 type App struct {
 	config Config
 
-	handler *http.ServeMux
-
-	mongo *mongo.Client
+	httpHandler *http.ServeMux
+	mongoClient *mongo.Client
 
 	accountService    account.Service
 	accountRepository account.MongoRepository
@@ -30,52 +29,41 @@ type App struct {
 
 func NewApp(config Config) (*App, error) {
 	app := &App{
-		config:  config,
-		handler: http.NewServeMux(),
+		config:      config,
+		httpHandler: http.NewServeMux(),
 	}
+
+	var err error
+
+	// map handlers
+	app.httpHandler.HandleFunc("/", app.helloHandlerFunc)
 
 	// initialize resources
-	if err := app.initResources(); err != nil {
-		return nil, errors.Wrap(err, "error initializing resources")
+	app.mongoClient, err = zmisc.NewMongoClient(app.config.MongoDbHost)
+	if err != nil {
+		return nil, errors.WithMessage(err, "error creating client for mongodb")
 	}
 
-	// initialize adapters
+	// initialize components
 	app.accountRepository.Inject(
-		app.mongo,
+		app.mongoClient,
 	)
 
-	// initialize services
 	app.accountService.Inject(
 		&app.accountRepository,
 	)
 
-	// initialize handlers
 	app.accountHandler.Inject(
 		"/auth",
 		&app.accountService,
 	)
-
-	// map handlers
-	app.handler.Handle("/auth/", &app.accountHandler)
-
-	app.handler.HandleFunc("/", app.helloHandlerFunc)
+	app.httpHandler.Handle("/auth/", &app.accountHandler)
 
 	return app, nil
 }
 
-func (s *App) initResources() error {
-	var err error
-
-	s.mongo, err = zmisc.NewMongoClient(s.config.MongoDbHost)
-	if err != nil {
-		return errors.Wrap(err, "error creating client for mongodb")
-	}
-
-	return nil
-}
-
 func (s *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.handler.ServeHTTP(w, r)
+	s.httpHandler.ServeHTTP(w, r)
 }
 
 func (s *App) helloHandlerFunc(w http.ResponseWriter, r *http.Request) {

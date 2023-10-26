@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 COOKIE_FILE=/tmp/cookies
-HOST_URL=http://localhost
+HOST_URL=http://localhost:80
 
 USERNAME=matheus$RANDOM$RANDOM$RANDOM$RANDOM
 
