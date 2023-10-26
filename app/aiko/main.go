@@ -9,7 +9,6 @@ import (
 
 	"go.elastic.co/apm/module/apmhttp"
 
-	"github.com/mahtues/instrumentality/app/aiko/server"
 	"github.com/mahtues/instrumentality/zmisc"
 )
 
@@ -32,20 +31,25 @@ func main() {
 		mongoDbHost = zmisc.FirstNonEmpty(*mongoDbHostArg, mongoDbHostEnv, mongoDbHostDefault)
 	)
 
-	config := server.Config{
+	config := Config{
 		Port:        appPort,
 		MongoDbHost: mongoDbHost,
 	}
 
 	log.Printf("app will listen on port %v", config.Port)
 
-	srv, err := server.NewServer(config)
+	app, err := NewApp(config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	srv := http.Server{
+		Addr:    fmt.Sprintf(":%v", config.Port),
+		Handler: apmhttp.Wrap(app),
+	}
+
 	log.Printf("app listening on port %v", config.Port)
-	if err := http.ListenAndServe(fmt.Sprintf(":%v", config.Port), apmhttp.Wrap(srv)); err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }

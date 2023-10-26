@@ -1,8 +1,7 @@
-package server
+package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -17,7 +16,7 @@ type Config struct {
 	MongoDbHost string
 }
 
-type Server struct {
+type App struct {
 	config Config
 
 	handler *http.ServeMux
@@ -29,44 +28,42 @@ type Server struct {
 	accountHandler    account.Handler
 }
 
-func NewServer(config Config) (*Server, error) {
-	server := &Server{
+func NewApp(config Config) (*App, error) {
+	app := &App{
 		config:  config,
 		handler: http.NewServeMux(),
 	}
 
 	// initialize resources
-	log.Print("initializing resources")
-	if err := server.initResources(); err != nil {
+	if err := app.initResources(); err != nil {
 		return nil, errors.Wrap(err, "error initializing resources")
 	}
-	log.Print("resources initialized")
 
 	// initialize adapters
-	server.accountRepository.Inject(
-		server.mongo,
+	app.accountRepository.Inject(
+		app.mongo,
 	)
 
 	// initialize services
-	server.accountService.Inject(
-		&server.accountRepository,
+	app.accountService.Inject(
+		&app.accountRepository,
 	)
 
 	// initialize handlers
-	server.accountHandler.Inject(
+	app.accountHandler.Inject(
 		"/auth",
-		&server.accountService,
+		&app.accountService,
 	)
 
 	// map handlers
-	server.handler.Handle("/auth/", &server.accountHandler)
+	app.handler.Handle("/auth/", &app.accountHandler)
 
-	server.handler.HandleFunc("/", server.helloHandlerFunc)
+	app.handler.HandleFunc("/", app.helloHandlerFunc)
 
-	return server, nil
+	return app, nil
 }
 
-func (s *Server) initResources() error {
+func (s *App) initResources() error {
 	var err error
 
 	s.mongo, err = zmisc.NewMongoClient(s.config.MongoDbHost)
@@ -77,10 +74,10 @@ func (s *Server) initResources() error {
 	return nil
 }
 
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.handler.ServeHTTP(w, r)
 }
 
-func (s *Server) helloHandlerFunc(w http.ResponseWriter, r *http.Request) {
+func (s *App) helloHandlerFunc(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "hello from app running on port %v\n", s.config.Port)
 }
