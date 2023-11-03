@@ -3,7 +3,7 @@ package account
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"github.com/mahtues/instrumentality/zerrors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -49,7 +49,7 @@ func (m *MongoRepository) FindByUsername(ctx context.Context, username Username)
 	collection := m.client.Database("instrumentality").Collection("accounts")
 	var mongoAccount MongoAccount
 	if err := collection.FindOne(ctx, bson.D{{"username", username}}).Decode(&mongoAccount); err != nil {
-		return Account{}, errors.Wrap(err, "invalid username")
+		return Account{}, zerrors.Wrapf(err, "username not found")
 	}
 	return decode(mongoAccount), nil
 }
