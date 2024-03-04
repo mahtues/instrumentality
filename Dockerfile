@@ -14,6 +14,6 @@ WORKDIR /
 
 COPY --from=build-stage /app/bin/aiko /app/aiko
 
-EXPOSE 9999
+EXPOSE 2112
 
 ENTRYPOINT ["/app/aiko"]
