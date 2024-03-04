@@ -27,6 +27,8 @@ services:
     - 3000:3000
     volumes:
     - grafana-storage:/var/lib/grafana
+    - ./z-docker-compose-configs/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/default.yaml
+    - ./z-docker-compose-configs/grafana/dashboards/:/var/lib/grafana/dashboards/
 
   aiko:
     image: mahtues/aiko
