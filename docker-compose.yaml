@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  aiko:
+    image: mahtues/aiko
+    build:
+      context: .
+      target: aiko-release
+    deploy:
+      replicas: 5
+
+  grafana:
+    image: grafana/grafana
+    ports:
+    - 3000:3000
+    volumes:
+    - grafana-storage:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+    - 9090:9090
+    volumes:
+    - prometheus-data:/prometheus
+    - ./zconfigs/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+
+volumes:
+  grafana-storage:
+  prometheus-data:
